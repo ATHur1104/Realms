@@ -1,67 +1,45 @@
-import React, { useState } from "react";
-import { useQuery, useLazyQuery } from "@apollo/client";
-import { useParams } from "react-router-dom";
-import GameComponent from "../components/GameSearch";
-import "./ApiTest.css";
-import MemberList from "../components/MemberList";
-import NoteForm from "../components/NoteForm";
-import NoteList from "../components/NoteList";
-import { QUERY_SINGLE_GROUP, GET_ME } from "../utils/queries";
-import JoinGroup from "../components/JoinGroup";
-import GroupSidebar from "../components/GroupSidebar";
-// import MediaQuery from "react-responsive";
+import React, { useState, useEffect } from 'react';
+import './Gauge.css'; // You'll need to define your CSS styles
 
-// if username id === ownerName id then display change Game button
+function Gauge() {
+  const [width, setWidth] = useState(0);
 
-function ApiTest() {
-  const { groupId } = useParams();
-  const { loading: meLoading, data: meData } = useQuery(GET_ME);
-  const { loading, data } = useQuery(QUERY_SINGLE_GROUP, {
-    variables: { id: groupId },
-  });
-  const group = data?.group || {};
+  useEffect(() => {
+    // Function to increment the gauge width
+    const incrementGauge = () => {
+      if (width < 100) {
+        setWidth((prevWidth) => prevWidth + 1);
+      }
+    };
 
-  // console.log('data', data, loading);
-  // console.log('groupmembers:', group?.groupMembers , meData?.me._id);
-  // group.groupMembers.find(context.user._id)
+    // timer will = the number set to increments example 25 is 2.5 seconds for the bar to fill
+    const timer = setInterval(incrementGauge, 25);
 
-  if (!group?.groupMembers?.some((member) => meData?.me?._id === member._id)) {
-    return (
-      <div>
-        <JoinGroup groupId={group._id} userId={meData?.me?._id} />
-      </div>
-    );
-  }
+    // Clean up the timer when the component unmounts
+    return () => {
+      clearInterval(timer);
+    };
+  }, [width]);
+
+  const handleReset = () => {
+    // Reset the gauge width to 0 when the button is clicked
+    setWidth(0);
+  };
+
   return (
-    <div className="card">
-      <div className="name">{group.groupName}</div>
-      <div className="container">
-        {/* <MediaQuery query="(min-width: 768px)"> */}
-        <GroupSidebar />
-        {/* </MediaQuery> */}
-        {/* <GroupSidebar /> */}
-        <div className="notes">
-          <NoteForm groupId={group?._id} username={meData?.me?.username} />
-
-          {/* make categories expandable, asc/desc by date, filter by user */}
-          <div className="notelist">
-            <ul className="title">
-              {group?.notes?.map((note) => {
-               
-                return (
-
-                  <NoteList note={note} key={note._id} group={group} />
-
-                )
-              })
-              }
-            </ul>
-          </div>
-
+    <>
+    <div className="gaugeContainer">
+      <div className="gaugeFill" style={{ width: `${width}%` }}>
+        <div className="gaugeContent">
+          {`${width}%`}
         </div>
       </div>
     </div>
+    <div>
+      <button onClick={handleReset}>Reset</button>
+    </div>
+    </>
   );
 }
 
-export default ApiTest;
+export default Gauge;

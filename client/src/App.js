@@ -59,14 +59,14 @@ function App() {
                 path="/signup" 
                 element={<Signup />} 
               />
+                <Route
+                  path="/test"
+                  element={<ApiTest />}
+                />
               <Route
                 path="/group/:groupId"
                 element={<Group />}
               />
-              {/* <Route
-                path="/group/:groupId"
-                element={<ApiTest />}
-              /> */}
               {/* <Route 
                 path="/success" 
                 element={<Success />} 
